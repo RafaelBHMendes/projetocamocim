@@ -1,39 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import Breadcrumbs from "../biddings/components/Breadcrumbs";
 import Filters from "../biddings/components/filters";
 import BiddingsTable from "../biddings/components/BiddingsTable";
 
-// Define your Bidding interface based on the expected shape of your data
-interface Bidding {
-  id: number;
-  processNumber: string;
-  object: string;
-  date: string;
-  opening: string;
-}
+const mockBiddings = [
+  // Populate with mock data
+  {
+    processNumber: "1910.01/2023",
+    object: "Publicação...",
+    date: "16/11/2023",
+    opening: "Aberta",
+  },
+  // More entries...
+];
 
 const LicitacoesPage: React.FC = () => {
-  const [biddings, setBiddings] = useState<Bidding[]>([]);
-  const [filteredBiddings, setFilteredBiddings] = useState<Bidding[]>([]);
-
-  useEffect(() => {
-    // Function to fetch biddings from the backend
-    const fetchBiddings = async () => {
-      const response = await fetch("/api/biddings"); // Update this URL to wherever your API endpoint is
-      const data: Bidding[] = await response.json();
-      setBiddings(data);
-      setFilteredBiddings(data);
-    };
-
-    fetchBiddings().catch(console.error); // Log the error if the fetch fails
-  }, []);
+  const [biddings, setBiddings] = useState(mockBiddings);
+  const [filteredBiddings, setFilteredBiddings] = useState(mockBiddings);
 
   const handleSearch = (searchTerm: string) => {
     if (!searchTerm.trim()) {
-      setFilteredBiddings(biddings);
+      setFilteredBiddings(mockBiddings);
       return;
     }
 
