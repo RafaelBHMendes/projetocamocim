@@ -1,13 +1,14 @@
 -- CreateEnum
-CREATE TYPE "OpeningStatus" AS ENUM ('Aberta', 'Fechada');
+CREATE TYPE "Opening" AS ENUM ('Aberta', 'Fechada');
 
 -- CreateTable
 CREATE TABLE "Bidding" (
     "id" SERIAL NOT NULL,
-    "processNumber" TEXT NOT NULL,
+    "processNumber" VARCHAR(255) NOT NULL,
     "object" TEXT NOT NULL,
     "date" TIMESTAMP(3) NOT NULL,
-    "opening" "OpeningStatus" NOT NULL DEFAULT 'Aberta',
+    "opening" "Opening" NOT NULL,
+    "view" BYTEA NOT NULL,
 
     CONSTRAINT "Bidding_pkey" PRIMARY KEY ("id")
 );

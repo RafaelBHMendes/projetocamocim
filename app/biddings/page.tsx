@@ -1,29 +1,47 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import Breadcrumbs from "../biddings/components/Breadcrumbs";
 import Filters from "../biddings/components/filters";
 import BiddingsTable from "../biddings/components/BiddingsTable";
+import supabase from "../lib/supabase";
 
-const mockBiddings = [
-  // Populate with mock data
-  {
-    processNumber: "1910.01/2023",
-    object: "Publicação...",
-    date: "16/11/2023",
-    opening: "Aberta",
-  },
-  // More entries...
-];
+// Define your Bidding interface based on the expected shape of your data
+interface Bidding {
+  id: number;
+  processNumber: string;
+  object: string;
+  date: string;
+  opening: string;
+}
 
 const LicitacoesPage: React.FC = () => {
-  const [biddings, setBiddings] = useState(mockBiddings);
-  const [filteredBiddings, setFilteredBiddings] = useState(mockBiddings);
+  const [biddings, setBiddings] = useState<Bidding[]>([]);
+  const [filteredBiddings, setFilteredBiddings] = useState<Bidding[]>([]);
+
+  useEffect(() => {
+    // Função atualizada para buscar licitações da Supabase
+    const fetchBiddings = async () => {
+      const { data, error } = await supabase
+        .from("Bidding") // Substitua pelo nome correto da sua tabela
+        .select("*");
+      if (error) {
+        console.error("Erro ao buscar licitações: ", error);
+        return;
+      }
+
+      // Atualize o estado com os dados recebidos do Supabase
+      setBiddings(data || []); // Utilize 'data || []' para evitar atribuir 'null'
+      setFilteredBiddings(data || []);
+    };
+
+    fetchBiddings();
+  }, []);
 
   const handleSearch = (searchTerm: string) => {
     if (!searchTerm.trim()) {
-      setFilteredBiddings(mockBiddings);
+      setFilteredBiddings(biddings);
       return;
     }
 

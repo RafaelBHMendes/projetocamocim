@@ -13,15 +13,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum OpeningStatus {
+enum Opening {
   Aberta
   Fechada
 }
 
 model Bidding {
-  id            Int           @id @default(autoincrement())
-  processNumber String
+  id            Int      @id @default(autoincrement())
+  processNumber String   @db.VarChar(255)
   object        String
   date          DateTime
-  opening       OpeningStatus @default(Aberta)
+  opening       Opening
+  view          Bytes
 }

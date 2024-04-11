@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
+import supabase from "../lib/supabase";
 
 interface Bid {
   id: number;
@@ -11,17 +12,7 @@ interface Bid {
 }
 
 const AdminPage: React.FC = () => {
-  const [biddings, setBiddings] = useState<Bid[]>([
-    // Initially populate with some mock data if needed
-    {
-      id: 1,
-      processNumber: "0001",
-      object: "Objeto 1",
-      date: "01/01/2023",
-      opening: "Aberta",
-    },
-    // ...more items
-  ]);
+  const [biddings, setBiddings] = useState<Bid[]>([]);
   const [newBid, setNewBid] = useState<Omit<Bid, "id">>({
     processNumber: "",
     object: "",
@@ -32,26 +23,50 @@ const AdminPage: React.FC = () => {
 
   const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[012])\/(19|20)\d\d$/;
 
-  const handleAddBid = async (): Promise<void> => {
-    if (!dateRegex.test(newBid.date)) {
-      setDateError("Invalid date. Expected format dd/mm/yyyy.");
-      return;
-    }
-    setDateError("");
-
-    const id = Math.max(...biddings.map((bid) => bid.id), 0) + 1; // Mocking ID generation
-    const formattedBid: Bid = {
-      id,
-      ...newBid,
-      date: newBid.date.split("/").reverse().join("-"), // Mocking date format conversion
+  useEffect(() => {
+    const fetchData = async () => {
+      let { data, error } = await supabase.from("Bidding").select("*");
+      if (error) console.error("Error fetching biddings", error);
+      else setBiddings(data || []); // Aqui está a correção
     };
 
-    setBiddings([...biddings, formattedBid]);
-    setNewBid({ processNumber: "", object: "", date: "", opening: "Aberta" }); // Reset form
+    fetchData();
+  }, []);
+
+  const handleAddBid = async (): Promise<void> => {
+    if (!dateRegex.test(newBid.date)) {
+      setDateError("Invalid date format. Use dd/mm/yyyy.");
+      return;
+    }
+
+    const { data, error } = await supabase.from("Bidding").insert([
+      {
+        ...newBid,
+        date: new Date(
+          newBid.date.split("/").reverse().join("-")
+        ).toISOString(),
+      },
+    ]);
+
+    if (error) {
+      console.error("Failed to add bid", error);
+      // Handle error state here
+    } else if (data) {
+      // Certifique-se de que data não seja null antes de usar
+      setBiddings([...biddings, ...data]);
+      setNewBid({ processNumber: "", object: "", date: "", opening: "Aberta" }); // Reset form
+    }
   };
 
   const handleRemoveBid = async (id: number): Promise<void> => {
-    setBiddings(biddings.filter((bid) => bid.id !== id));
+    const { error } = await supabase.from("Biddings").delete().match({ id });
+
+    if (error) {
+      console.error("Failed to remove bid", error);
+      // Handle error state here
+    } else {
+      setBiddings(biddings.filter((bid) => bid.id !== id));
+    }
   };
 
   return (
@@ -121,7 +136,7 @@ const AdminPage: React.FC = () => {
       <ul className="divide-y divide-gray-200 mt-6">
         {biddings.map((bid, index) => (
           <li
-            key={index}
+            key={bid.id}
             className="py-4 flex items-center justify-between space-x-3"
           >
             <div className="flex-1 min-w-0">
