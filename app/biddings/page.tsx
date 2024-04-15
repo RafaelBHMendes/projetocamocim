@@ -24,7 +24,7 @@ const LicitacoesPage: React.FC = () => {
     // Função atualizada para buscar licitações da Supabase
     const fetchBiddings = async () => {
       const { data, error } = await supabase
-        .from("Bidding") // Substitua pelo nome correto da sua tabela
+        .from("bidding") // Substitua pelo nome correto da sua tabela
         .select("*");
       if (error) {
         console.error("Erro ao buscar licitações: ", error);

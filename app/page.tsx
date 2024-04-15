@@ -1,11 +1,25 @@
 import Image from "next/image";
 import Header from "./components/Header";
 
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 import underconstruction from "../public/underconstruction.svg";
 
 export default function Home() {
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <div className="flex flex-col">
         <Header />
         <div className="relative flex justify-center items-center h-screen">
