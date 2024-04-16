@@ -14,6 +14,7 @@ interface Bidding {
   object: string;
   date: string;
   opening: string;
+  file: undefined;
 }
 
 const LicitacoesPage: React.FC = () => {

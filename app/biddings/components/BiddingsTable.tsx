@@ -8,6 +8,7 @@ interface Bidding {
   object: string;
   date: string;
   opening: string;
+  file: undefined;
 }
 
 const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
@@ -35,7 +36,10 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
               <td className="py-2 px-4">{bid.date}</td>
               <td className="py-2 px-4">{bid.opening}</td>
               <td className="py-2 px-4">
-                <button className="text-blue-500 hover:text-blue-800">
+                <button
+                  className="text-blue-500 hover:text-blue-800"
+                  onClick={() => window.open(bid.file, "_blank")}
+                >
                   Ver
                 </button>
                 {/* Adicione mais botões de ação conforme necessário */}

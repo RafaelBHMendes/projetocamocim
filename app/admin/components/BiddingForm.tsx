@@ -1,3 +1,4 @@
+import supabase from "@/app/lib/supabase";
 import { Bid } from "./types";
 
 interface BiddingFormProps {
@@ -57,6 +58,16 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             onChange={handleInputChange}
             className="mt-1 block w-full border rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
           />
+          {/*<label className="block text-sm font-medium text-gray-700">
+            PDF do Processo
+          </label>
+          <input
+            name="file"
+            type="file"
+            accept="application/pdf"
+            onChange={handleInputChange}
+            className="mt-1 block w-full border shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+          />*/}
           <div className="flex justify-between items-center">
             <select
               name="opening"

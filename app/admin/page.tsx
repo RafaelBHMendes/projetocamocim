@@ -14,6 +14,7 @@ const AdminPage: React.FC = () => {
     object: "",
     date: "",
     opening: "Aberta",
+    file: undefined,
   });
 
   useEffect(() => {
@@ -33,7 +34,6 @@ const AdminPage: React.FC = () => {
         date: new Date(bid.date.split("/").reverse().join("-")).toISOString(),
       },
     ]);
-
     if (error) {
       console.error("Failed to add bid", error);
       toast.error("Erro: " + error.message);

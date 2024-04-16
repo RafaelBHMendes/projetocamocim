@@ -4,5 +4,6 @@ export interface Bid {
     object: string;
     date: string;
     opening: 'Aberta' | 'Fechada';  // assegura que o tipo seja um desses dois valores
+    file?: File;
   }
   
