@@ -1,18 +1,20 @@
 import supabase from "@/app/lib/supabase";
 
-export async function uploadPdf(file: File): Promise<string | null> {
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-  const filePath = `pdfs/${fileName}`;
+export const uploadPdf = async (file: File): Promise<string | null> => {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random()}.${fileExt}`;
+    const { data, error } = await supabase.storage
+      .from('PDFs')
+      .upload(fileName, file);
 
-  let { error, data } = await supabase.storage
-    .from('PDFs')
-    .upload(filePath, file);
+    if (error) {
+      throw error;
+    }
 
-  if (error) {
-    console.error('Upload error:', error.message);
+    return fileName;
+  } catch (error) {
+    console.error('Error uploading the file: ', error);
     return null;
   }
-
-  return filePath;
-}
+};

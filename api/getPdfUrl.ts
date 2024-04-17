@@ -1,14 +1,13 @@
 import supabase from "@/app/lib/supabase";
 
-export async function getPdfUrl(filePath: string): Promise<string> {
+export const getPdfUrl = async (filePath: string): Promise<string> => {
   const { data } = supabase.storage
     .from('PDFs')
     .getPublicUrl(filePath);
 
   if (!data) {
-    console.error('Error retrieving public URL');
-    return '';
+    throw data;
   }
 
   return data.publicUrl || '';
-}
+};

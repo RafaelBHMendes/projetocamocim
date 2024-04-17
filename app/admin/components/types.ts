@@ -5,7 +5,7 @@ export interface Bid {
     publicationDate: string;
     dispenseDate: string;
     opening: 'Aberta' | 'Fechada';  // assegura que o tipo seja um desses dois valores
-    file?: File;
+    file?: string;
     Url: string;
   }
   

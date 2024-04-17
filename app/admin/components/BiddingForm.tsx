@@ -22,16 +22,18 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
   ) => {
     const { name, value } = e.target;
     setNewBid({ ...newBid, [name]: value });
+    console.log(newBid);
   };
-
-  const [pdfUrl, setPdfUrl] = useState("");
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
-      const filePath = await uploadPdf(e.target.files[0]);
+      const file = e.target.files[0];
+      const filePath = await uploadPdf(file);
+      console.log(filePath);
       if (filePath) {
         const url = await getPdfUrl(filePath);
-        setPdfUrl(url);
+        setNewBid({ ...newBid, file: url });
+        console.log(url);
       }
     }
   };
