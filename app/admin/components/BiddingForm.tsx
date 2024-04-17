@@ -1,4 +1,9 @@
-import supabase from "@/app/lib/supabase";
+"use client";
+
+import { useState } from "react";
+import { getPdfUrl } from "../../../api/getPdfUrl";
+import { uploadPdf } from "../../../api/uploadPdf";
+
 import { Bid } from "./types";
 
 interface BiddingFormProps {
@@ -17,6 +22,18 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
   ) => {
     const { name, value } = e.target;
     setNewBid({ ...newBid, [name]: value });
+  };
+
+  const [pdfUrl, setPdfUrl] = useState("");
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      const filePath = await uploadPdf(e.target.files[0]);
+      if (filePath) {
+        const url = await getPdfUrl(filePath);
+        setPdfUrl(url);
+      }
+    }
   };
 
   return (
@@ -48,26 +65,50 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             htmlFor="date"
             className="block text-sm font-medium text-gray-700"
           >
-            Data
+            Data de Publicação
           </label>
           <input
-            name="date"
+            name="publicationDate"
             type="text"
             placeholder="Data (dd/mm/aaaa)"
-            value={newBid.date}
+            value={newBid.publicationDate}
             onChange={handleInputChange}
             className="mt-1 block w-full border rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
           />
-          {/*<label className="block text-sm font-medium text-gray-700">
+          <label
+            htmlFor="date"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Data de Dispensa
+          </label>
+          <input
+            name="dispenseDate"
+            type="text"
+            placeholder="Data (dd/mm/aaaa)"
+            value={newBid.dispenseDate}
+            onChange={handleInputChange}
+            className="mt-1 block w-full border rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+          />
+          <label className="block text-sm font-medium text-gray-700">
             PDF do Processo
           </label>
           <input
             name="file"
             type="file"
             accept="application/pdf"
-            onChange={handleInputChange}
+            onChange={handleFileChange}
             className="mt-1 block w-full border shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
-          />*/}
+          />
+          <label className="block text-sm font-medium text-gray-700">
+            Url do processo
+          </label>
+          <input
+            name="Url"
+            type="text"
+            placeholder="https://exemplo.com"
+            value={newBid.Url}
+            onChange={handleInputChange}
+          />
           <div className="flex justify-between items-center">
             <select
               name="opening"

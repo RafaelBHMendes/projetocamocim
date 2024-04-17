@@ -2,8 +2,10 @@ export interface Bid {
     id?: number;  // opcional porque não é necessário ao criar um novo bid
     processNumber: string;
     object: string;
-    date: string;
+    publicationDate: string;
+    dispenseDate: string;
     opening: 'Aberta' | 'Fechada';  // assegura que o tipo seja um desses dois valores
     file?: File;
+    Url: string;
   }
   

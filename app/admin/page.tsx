@@ -12,9 +12,11 @@ const AdminPage: React.FC = () => {
   const [newBid, setNewBid] = useState<Bid>({
     processNumber: "",
     object: "",
-    date: "",
+    publicationDate: "",
+    dispenseDate: "",
     opening: "Aberta",
     file: undefined,
+    Url: "",
   });
 
   useEffect(() => {
@@ -31,7 +33,12 @@ const AdminPage: React.FC = () => {
     const { data, error } = await supabase.from("bidding").insert([
       {
         ...bid,
-        date: new Date(bid.date.split("/").reverse().join("-")).toISOString(),
+        publicationDate: new Date(
+          bid.publicationDate.split("/").reverse().join("-")
+        ).toISOString(),
+        dispenseDate: new Date(
+          bid.dispenseDate.split("/").reverse().join("-")
+        ).toISOString(),
       },
     ]);
     if (error) {
@@ -39,7 +46,14 @@ const AdminPage: React.FC = () => {
       toast.error("Erro: " + error.message);
     } else if (data) {
       setBiddings((prevBids) => [...prevBids, ...data]);
-      setNewBid({ processNumber: "", object: "", date: "", opening: "Aberta" }); // Reset form
+      setNewBid({
+        processNumber: "",
+        object: "",
+        publicationDate: "",
+        dispenseDate: "",
+        opening: "Aberta",
+        Url: "",
+      }); // Reset form
       toast.success("Licitação Adicionada!");
     }
   };

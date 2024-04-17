@@ -20,7 +20,9 @@ const BiddingList: React.FC<BiddingListProps> = ({ biddings, onRemove }) => {
                   {bid.processNumber}
                 </p>
                 <p className="text-sm text-gray-500 truncate">{bid.object}</p>
-                <p className="text-sm text-gray-500 truncate">{bid.date}</p>
+                <p className="text-sm text-gray-500 truncate">
+                  {bid.publicationDate}
+                </p>
               </div>
               <span
                 className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${

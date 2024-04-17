@@ -12,9 +12,11 @@ interface Bidding {
   id: number;
   processNumber: string;
   object: string;
-  date: string;
+  publicationDate: string;
+  dispenseDate: string;
   opening: string;
   file: undefined;
+  Url: string;
 }
 
 const LicitacoesPage: React.FC = () => {

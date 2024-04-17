@@ -6,9 +6,11 @@ interface Bidding {
   id: number;
   processNumber: string;
   object: string;
-  date: string;
+  publicationDate: string;
+  dispenseDate: string;
   opening: string;
   file: undefined;
+  Url: string;
 }
 
 const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
@@ -23,7 +25,8 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
           <tr>
             <th className="py-2 px-4 bg-blue-200">Nº Processo</th>
             <th className="py-2 px-4 bg-blue-200">Objeto</th>
-            <th className="py-2 px-4 bg-blue-200">Data</th>
+            <th className="py-2 px-4 bg-blue-200">Data de Publicação</th>
+            <th className="py-2 px-4 bg-blue-200">Data de Dispensa</th>
             <th className="py-2 px-4 bg-blue-200">Abertura</th>
             <th className="py-2 px-4 bg-blue-200">Ações</th>
           </tr>
@@ -33,16 +36,22 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
             <tr key={bid.id} className="text-center border-b">
               <td className="py-2 px-4">{bid.processNumber}</td>
               <td className="py-2 px-4">{bid.object}</td>
-              <td className="py-2 px-4">{bid.date}</td>
+              <td className="py-2 px-4">{bid.publicationDate}</td>
+              <td className="py-2 px-4">{bid.dispenseDate}</td>
               <td className="py-2 px-4">{bid.opening}</td>
               <td className="py-2 px-4">
                 <button
-                  className="text-blue-500 hover:text-blue-800"
+                  className="text-blue-500 hover:text-blue-800 "
                   onClick={() => window.open(bid.file, "_blank")}
                 >
-                  Ver
+                  Pdf
                 </button>
-                {/* Adicione mais botões de ação conforme necessário */}
+                <button
+                  className="text-blue-500 hover:text-blue-800"
+                  onClick={() => window.open(bid.Url, "_blank")}
+                >
+                  Site
+                </button>
               </td>
             </tr>
           ))}
