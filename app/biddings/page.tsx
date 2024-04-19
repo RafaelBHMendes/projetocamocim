@@ -17,11 +17,15 @@ interface Bidding {
   opening: string;
   file: undefined;
   Url: string;
+  modality: "Dispensa" | "Pregão" | "Concurso" | "Credenciamento";
 }
 
 const LicitacoesPage: React.FC = () => {
   const [biddings, setBiddings] = useState<Bidding[]>([]);
   const [filteredBiddings, setFilteredBiddings] = useState<Bidding[]>([]);
+  const [activeButton, setActiveButton] = useState<
+    "Avisos" | "Licitações" | "Dispensas"
+  >("Avisos");
 
   useEffect(() => {
     // Função atualizada para buscar licitações da Supabase
@@ -41,6 +45,30 @@ const LicitacoesPage: React.FC = () => {
 
     fetchBiddings();
   }, []);
+
+  useEffect(() => {
+    filterBiddings();
+  }, [activeButton, biddings]);
+
+  const handleButtonClick = (
+    buttonType: "Avisos" | "Licitações" | "Dispensas"
+  ) => {
+    setActiveButton(buttonType);
+  };
+
+  const filterBiddings = () => {
+    if (activeButton === "Avisos") {
+      setFilteredBiddings(biddings);
+    } else if (activeButton === "Dispensas") {
+      setFilteredBiddings(
+        biddings.filter((bidding) => bidding.modality === "Dispensa")
+      );
+    } else {
+      setFilteredBiddings(
+        biddings.filter((bidding) => bidding.modality !== "Dispensa")
+      );
+    }
+  };
 
   const handleSearch = (searchTerm: string) => {
     if (!searchTerm.trim()) {
@@ -62,6 +90,36 @@ const LicitacoesPage: React.FC = () => {
   return (
     <div>
       <Breadcrumbs />
+      <div className="flex justify-between items-center text-white bg-slate-800 p-4">
+        <div className="text-lg font-semibold"> {activeButton}</div>
+        <div className="flex gap-4">
+          <button
+            onClick={() => handleButtonClick("Avisos")}
+            className={`bg-blue-600 hover:bg-blue-700 text-sm font-medium py-2 px-4 rounded-full transition duration-300 ease-in-out ${
+              activeButton === "Avisos" ? "active-class" : ""
+            }`}
+          >
+            Todas as Licitações
+          </button>
+          <button
+            onClick={() => handleButtonClick("Licitações")}
+            className={`bg-blue-600 hover:bg-blue-700 text-sm font-medium py-2 px-4 rounded-full transition duration-300 ease-in-out ${
+              activeButton === "Licitações" ? "active-class" : ""
+            }`}
+          >
+            Licitações
+          </button>
+          <button
+            onClick={() => handleButtonClick("Dispensas")}
+            className={`bg-blue-600 hover:bg-blue-700 text-sm font-medium py-2 px-4 rounded-full transition duration-300 ease-in-out ${
+              activeButton === "Dispensas" ? "active-class" : ""
+            }`}
+          >
+            Avisos Lei Nº 14.133 - Dispensas
+          </button>
+        </div>
+      </div>
+
       <Filters onSearch={handleSearch} />
       <BiddingsTable biddings={filteredBiddings} />
     </div>

@@ -23,18 +23,19 @@ const Filters: React.FC<{ onSearch: (term: string) => void }> = ({
         type="text"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        placeholder="Pesquisar"
-        className="border p-2 rounded"
+        placeholder="Pesquisar..."
+        className="border-2 border-slate-300 hover:border-slate-500 p-2 rounded-full"
       />
+
       <button
         onClick={handleSearch}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
       >
         Pesquisar
       </button>
       <button
         onClick={handleClear}
-        className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded"
+        className="bg-gray-300 hover:bg-gray-400 text-black py-2 px-4 rounded-full"
       >
         Limpar
       </button>

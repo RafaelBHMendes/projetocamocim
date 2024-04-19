@@ -7,5 +7,6 @@ export interface Bid {
     opening: 'Aberta' | 'Fechada';  // assegura que o tipo seja um desses dois valores
     file?: string;
     Url: string;
+    modality: "Pregão" | "Concurso" | "Credenciamento" | "Dispensa";
   }
   

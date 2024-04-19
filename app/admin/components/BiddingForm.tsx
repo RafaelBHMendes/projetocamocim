@@ -52,6 +52,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             placeholder="Nº Processo"
             value={newBid.processNumber}
             onChange={handleInputChange}
+            className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
           <label className="block text-sm font-medium text-gray-700">
             Objeto
@@ -62,6 +63,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             placeholder="Objeto"
             value={newBid.object}
             onChange={handleInputChange}
+            className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
           <label
             htmlFor="date"
@@ -75,7 +77,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             placeholder="Data (dd/mm/aaaa)"
             value={newBid.publicationDate}
             onChange={handleInputChange}
-            className="mt-1 block w-full border rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+            className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
           <label
             htmlFor="date"
@@ -89,8 +91,24 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             placeholder="Data (dd/mm/aaaa)"
             value={newBid.dispenseDate}
             onChange={handleInputChange}
-            className="mt-1 block w-full border rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200"
+            className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
+          <label className="block text-sm font-medium text-gray-700">
+            Modalidade
+          </label>
+          <div className="flex justify-between items-center">
+            <select
+              name="modality"
+              value={newBid.modality}
+              onChange={handleInputChange}
+              className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
+            >
+              <option value="Pregão">Pregão</option>
+              <option value="Concurso">Concurso</option>
+              <option value="Credenciamento">Credenciamento</option>
+              <option value="Dispensa">Dispensa</option>
+            </select>
+          </div>
           <label className="block text-sm font-medium text-gray-700">
             PDF do Processo
           </label>
@@ -110,12 +128,17 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             placeholder="https://exemplo.com"
             value={newBid.Url}
             onChange={handleInputChange}
+            className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
+          <label className="block text-sm font-medium text-gray-700">
+            Abertura
+          </label>
           <div className="flex justify-between items-center">
             <select
               name="opening"
               value={newBid.opening}
               onChange={handleInputChange}
+              className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
             >
               <option value="Aberta">Aberta</option>
               <option value="Fechada">Fechada</option>

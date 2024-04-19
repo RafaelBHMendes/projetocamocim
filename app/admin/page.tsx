@@ -17,6 +17,7 @@ const AdminPage: React.FC = () => {
     opening: "Aberta",
     file: undefined,
     Url: "",
+    modality: "Pregão",
   });
 
   useEffect(() => {
@@ -53,6 +54,7 @@ const AdminPage: React.FC = () => {
         dispenseDate: "",
         opening: "Aberta",
         Url: "",
+        modality: "Pregão",
       }); // Reset form
       toast.success("Licitação Adicionada!");
     }
