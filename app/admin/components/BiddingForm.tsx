@@ -41,7 +41,9 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
   return (
     <>
       <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded">
-        <h1 className="text-lg text-center font-bold mb-4">Admin Dashboard</h1>
+        <h1 className="text-lg text-center font-bold mb-4">
+          Painel Administradivo
+        </h1>
         <div className="space-y-4">
           <label className="block text-sm font-medium text-gray-700">
             Nº do Processo
