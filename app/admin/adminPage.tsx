@@ -6,9 +6,8 @@ import BiddingForm from "../admin/components/BiddingForm";
 import BiddingList from "../admin/components/BiddingList";
 import supabase from "../lib/supabase"; // Ajuste conforme a localização do seu cliente Supabase
 import { toast } from "react-toastify";
-import { redirect } from "next/navigation";
-import { createClient } from "../lib/server";
 import { signOut } from "./components/SignOut";
+import EditModal from "../components/EditModal";
 
 const AdminPage: React.FC = () => {
   const [biddings, setBiddings] = useState<Bid[]>([]);
@@ -22,6 +21,8 @@ const AdminPage: React.FC = () => {
     Url: "",
     modality: "Pregão",
   });
+  const [isEditModalOpen, setEditModalOpen] = useState(false);
+  const [currentBid, setCurrentBid] = useState<Bid | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,8 +79,37 @@ const AdminPage: React.FC = () => {
     }
   };
 
+  const handleUpdateBid = async (updatedBid: Bid) => {
+    // Assegure que você importou o tipo 'Bid' corretamente
+    const { data, error } = await supabase
+      .from("bidding")
+      .update(updatedBid)
+      .match({ id: updatedBid.id });
+
+    if (error) {
+      console.error("Failed to update bid", error);
+      toast.error("Erro ao atualizar: " + error.message);
+    } else if (data) {
+      // Supabase por padrão retorna um array dos registros atualizados
+      setBiddings(biddings.map((bid) => (bid.id === data[0] ? data[0] : bid)));
+      handleCloseModal();
+      toast.success("Licitação Atualizada com Sucesso!");
+    }
+    setEditModalOpen(false);
+  };
+
   const handleSignOut = async () => {
     await signOut(); // Note que essa chamada não será mais definida aqui, apenas chamada
+  };
+
+  const handleEditBid = (bid: Bid) => {
+    setCurrentBid(bid);
+    setEditModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setEditModalOpen(false);
+    setCurrentBid(null); // Limpa o bid atual após fechar o modal
   };
 
   return (
@@ -93,7 +123,20 @@ const AdminPage: React.FC = () => {
         </button>
       </div>
       <BiddingForm onAdd={handleAddBid} newBid={newBid} setNewBid={setNewBid} />
-      <BiddingList biddings={biddings} onRemove={handleRemoveBid} />
+      <BiddingList
+        biddings={biddings}
+        onRemove={handleRemoveBid}
+        onEdit={handleEditBid}
+      />
+      {isEditModalOpen && (
+        <EditModal
+          bid={currentBid!}
+          isOpen={isEditModalOpen}
+          onClose={handleCloseModal}
+          onEdit={handleUpdateBid} // Esta função precisa ser definida para atualizar a licitação
+          setBid={setCurrentBid}
+        />
+      )}
     </div>
   );
 };
