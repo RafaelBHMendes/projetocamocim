@@ -1,28 +1,30 @@
-"use client";
+// components/EditModal.tsx
 
-import { useState } from "react";
-import { getPdfUrl } from "../../../api/getPdfUrl";
-import { uploadPdf } from "../../../api/uploadPdf";
+import React from "react";
+import { Bid } from "../admin/components/types";
+import { uploadPdf } from "@/api/uploadPdf";
+import { getPdfUrl } from "@/api/getPdfUrl";
 
-import { Bid } from "./types";
-
-interface BiddingFormProps {
-  onAdd: (bid: Bid) => void;
-  newBid: Bid;
-  setNewBid: React.Dispatch<React.SetStateAction<Bid>>;
+interface EditModalProps {
+  bid: Bid;
+  isOpen: boolean;
+  onClose: () => void;
+  onEdit: (bid: Bid) => void;
+  setBid: React.Dispatch<React.SetStateAction<Bid | null>>;
 }
 
-const BiddingForm: React.FC<BiddingFormProps> = ({
-  onAdd,
-  newBid,
-  setNewBid,
+const EditModal: React.FC<EditModalProps> = ({
+  bid,
+  isOpen,
+  onClose,
+  onEdit,
+  setBid,
 }) => {
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
-    setNewBid({ ...newBid, [name]: value });
-    console.log(newBid);
+    setBid((prev: any) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,18 +34,18 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
       console.log(filePath);
       if (filePath) {
         const url = await getPdfUrl(filePath);
-        setNewBid({ ...newBid, file: url });
+        setBid({ ...bid, file: url });
         console.log(url);
       }
     }
   };
 
+  if (!isOpen) return null;
+
   return (
-    <>
-      <div className="max-w-md mx-auto p-6 bg-white shadow-md rounded">
-        <h1 className="text-lg text-center font-bold mb-4">
-          Painel Administradivo
-        </h1>
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+      <div className="bg-white p-6 rounded shadow-lg">
+        <h2 className="text-lg font-bold mb-4">Editar Licitação</h2>
         <div className="space-y-4">
           <label className="block text-sm font-medium text-gray-700">
             Nº do Processo
@@ -52,7 +54,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             name="processNumber"
             type="text"
             placeholder="Nº Processo"
-            value={newBid.processNumber}
+            value={bid.processNumber}
             onChange={handleInputChange}
             className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
@@ -63,7 +65,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             name="object"
             type="text"
             placeholder="Objeto"
-            value={newBid.object}
+            value={bid.object}
             onChange={handleInputChange}
             className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
@@ -77,7 +79,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             name="publicationDate"
             type="text"
             placeholder="Data (dd/mm/aaaa)"
-            value={newBid.publicationDate}
+            value={bid.publicationDate}
             onChange={handleInputChange}
             className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
@@ -91,7 +93,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             name="dispenseDate"
             type="text"
             placeholder="Data (dd/mm/aaaa)"
-            value={newBid.dispenseDate}
+            value={bid.dispenseDate}
             onChange={handleInputChange}
             className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
@@ -101,7 +103,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
           <div className="flex justify-between items-center">
             <select
               name="modality"
-              value={newBid.modality}
+              value={bid.modality}
               onChange={handleInputChange}
               className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
             >
@@ -128,7 +130,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             name="Url"
             type="text"
             placeholder="https://exemplo.com"
-            value={newBid.Url}
+            value={bid.Url}
             onChange={handleInputChange}
             className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
           />
@@ -138,24 +140,32 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
           <div className="flex justify-between items-center">
             <select
               name="opening"
-              value={newBid.opening}
+              value={bid.opening}
               onChange={handleInputChange}
               className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
             >
               <option value="Aberta">Aberta</option>
               <option value="Fechada">Fechada</option>
             </select>
-            <button
-              onClick={() => onAdd(newBid)}
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Adicionar
-            </button>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button
+                onClick={onClose}
+                className="bg-gray-300 px-4 py-2 rounded"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => onEdit(bid)}
+                className="bg-blue-600 text-white px-4 py-2 rounded"
+              >
+                Salvar
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default BiddingForm;
+export default EditModal;

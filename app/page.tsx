@@ -5,6 +5,8 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import saeecamocim2 from "../public/saeecamocim2.jpg";
+import Footer from "./components/Footer";
+import MapView from "./components/MapView";
 
 export default function Home() {
   return (
@@ -37,6 +39,8 @@ export default function Home() {
             Site em Construção
           </h1>
         </div>
+        <MapView />
+        <Footer />
       </div>
     </>
   );
