@@ -4,9 +4,10 @@ import Header from "./components/Header";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import saeecamocim2 from "../public/saeecamocim2.jpg";
 import Footer from "./components/Footer";
 import MapView from "./components/MapView";
+import Carousel from "./components/Carousel";
+import Notices from "./components/Notices";
 
 export default function Home() {
   return (
@@ -24,21 +25,9 @@ export default function Home() {
       />
       <div className="flex flex-col">
         <Header />
-        <div className="relative flex justify-center items-center h-screen">
-          {/* Background image with absolute positioning */}
-          <Image
-            src={saeecamocim2}
-            alt="Banner de em construção"
-            fill
-            objectFit="cover"
-            quality={100}
-            className="z-0" // Ensure the image is behind the text
-          />
-          {/* Text overlay with relative positioning to bring it above the image */}
-          <h1 className="text-4xl font-bold text-center text-white relative z-10">
-            Site em Construção
-          </h1>
-        </div>
+
+        <Carousel />
+        <Notices />
         <MapView />
         <Footer />
       </div>
