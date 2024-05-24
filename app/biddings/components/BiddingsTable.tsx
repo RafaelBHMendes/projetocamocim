@@ -1,4 +1,3 @@
-// app/biddings/components/BiddingsTable.tsx
 import Image from "next/image";
 import React from "react";
 import Link from "next/link";
@@ -17,6 +16,16 @@ interface Bidding {
   Url: string;
 }
 
+const formatDateTime = (dateTimeString: string): string => {
+  const date = new Date(dateTimeString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${year}-${month}-${day} ${hours}:${minutes}`;
+};
+
 const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
   if (biddings.length === 0) {
     return <div className="text-center py-4">Não há resultados.</div>;
@@ -30,7 +39,7 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
             <th className="py-2 px-4 bg-blue-200">Nº Processo</th>
             <th className="py-2 px-4 bg-blue-200">Objeto</th>
             <th className="py-2 px-4 bg-blue-200">Data de Publicação</th>
-            <th className="py-2 px-4 bg-blue-200">Data de Dispensa</th>
+            <th className="py-2 px-4 bg-blue-200">Data de Abertura</th>
             <th className="py-2 px-4 bg-blue-200">Abertura</th>
             <th className="py-2 px-4 bg-blue-200">Ações</th>
           </tr>
@@ -41,7 +50,7 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
               <td className="py-2 px-4">{bid.processNumber}</td>
               <td className="py-2 px-4">{bid.object}</td>
               <td className="py-2 px-4">{bid.publicationDate}</td>
-              <td className="py-2 px-4">{bid.dispenseDate}</td>
+              <td className="py-2 px-4">{formatDateTime(bid.dispenseDate)}</td>
               <td className="py-2 px-4">{bid.opening}</td>
               <td className="py-2 px-4 ">
                 <div className="align-middle self-center flex flex-row gap-2">

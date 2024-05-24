@@ -24,7 +24,7 @@ const LicitacoesPage: React.FC = () => {
   const [biddings, setBiddings] = useState<Bidding[]>([]);
   const [filteredBiddings, setFilteredBiddings] = useState<Bidding[]>([]);
   const [activeButton, setActiveButton] = useState<
-    "Avisos" | "Licitações" | "Dispensas"
+    "Avisos" | "Licitações" | "Dispensas" | "Pregão"
   >("Avisos");
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const LicitacoesPage: React.FC = () => {
   }, [activeButton, biddings]);
 
   const handleButtonClick = (
-    buttonType: "Avisos" | "Licitações" | "Dispensas"
+    buttonType: "Avisos" | "Licitações" | "Dispensas" | "Pregão"
   ) => {
     setActiveButton(buttonType);
   };
@@ -63,16 +63,25 @@ const LicitacoesPage: React.FC = () => {
       setFilteredBiddings(
         biddings.filter((bidding) => bidding.modality === "Dispensa")
       );
-    } else {
+    } else if (activeButton === "Pregão") {
       setFilteredBiddings(
-        biddings.filter((bidding) => bidding.modality !== "Dispensa")
+        biddings.filter((bidding) => bidding.modality === "Pregão")
+      );
+    } else if (activeButton === "Licitações") {
+      setFilteredBiddings(
+        biddings.filter(
+          (bidding) =>
+            bidding.modality === "Pregão" ||
+            bidding.modality === "Concurso" ||
+            bidding.modality === "Credenciamento"
+        )
       );
     }
   };
 
   const handleSearch = (searchTerm: string) => {
     if (!searchTerm.trim()) {
-      setFilteredBiddings(biddings);
+      filterBiddings();
       return;
     }
 
@@ -108,6 +117,14 @@ const LicitacoesPage: React.FC = () => {
             }`}
           >
             Licitações
+          </button>
+          <button
+            onClick={() => handleButtonClick("Pregão")}
+            className={`bg-blue-600 hover:bg-blue-700 text-sm font-medium py-2 px-4 rounded-full transition duration-300 ease-in-out ${
+              activeButton === "Pregão" ? "active-class" : ""
+            }`}
+          >
+            Pregão
           </button>
           <button
             onClick={() => handleButtonClick("Dispensas")}

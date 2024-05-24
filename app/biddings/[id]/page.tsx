@@ -69,7 +69,7 @@ const BiddingDetailsPage: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <p>Data fim: {biddingDetails.dispenseDate}</p>
+          <p>Data Dispensa: {biddingDetails.dispenseDate}</p>
 
           <p>Portal dos terceiros: M2A TECNOLOGIA</p>
         </div>

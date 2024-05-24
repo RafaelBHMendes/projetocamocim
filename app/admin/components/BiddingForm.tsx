@@ -75,7 +75,7 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
           </label>
           <input
             name="publicationDate"
-            type="text"
+            type="date"
             placeholder="Data (dd/mm/aaaa)"
             value={newBid.publicationDate}
             onChange={handleInputChange}
@@ -85,12 +85,11 @@ const BiddingForm: React.FC<BiddingFormProps> = ({
             htmlFor="date"
             className="block text-sm font-medium text-gray-700"
           >
-            Data de Dispensa
+            Abertura do Certame
           </label>
           <input
             name="dispenseDate"
-            type="text"
-            placeholder="Data (dd/mm/aaaa)"
+            type="datetime-local"
             value={newBid.dispenseDate}
             onChange={handleInputChange}
             className="border-2 border-slate-300 hover:border-slate-600 rounded-lg placeholder:p-2"
