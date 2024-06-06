@@ -15,7 +15,19 @@ interface BiddingDetails {
   opening: string;
   file: string;
   Url: string;
+  postponement: string | null;
 }
+
+const formatDateTime = (dateTimeString: string): string => {
+  if (!dateTimeString) return "";
+  const date = new Date(dateTimeString);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  return `${day}/${month}/${year} ${hours}:${minutes}`;
+};
 
 const BiddingDetailsPage: React.FC = () => {
   const [biddingDetails, setBiddingDetails] = useState<BiddingDetails | null>(
@@ -69,7 +81,10 @@ const BiddingDetailsPage: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <p>Data Dispensa: {biddingDetails.dispenseDate}</p>
+          <p>Data Dispensa: {formatDateTime(biddingDetails.dispenseDate)}</p>
+          {biddingDetails.postponement && (
+            <p>Adiamento: {formatDateTime(biddingDetails.postponement)}</p>
+          )}
 
           <p>Portal dos terceiros: M2A TECNOLOGIA</p>
         </div>
