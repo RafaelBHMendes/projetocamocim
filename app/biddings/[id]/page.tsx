@@ -81,9 +81,11 @@ const BiddingDetailsPage: React.FC = () => {
         </div>
 
         <div className="mb-4">
-          <p>Data Dispensa: {formatDateTime(biddingDetails.dispenseDate)}</p>
+          <p>Data Certame: {formatDateTime(biddingDetails.dispenseDate)}</p>
           {biddingDetails.postponement && (
-            <p>Adiamento: {formatDateTime(biddingDetails.postponement)}</p>
+            <p>
+              Data do Adiamento: {formatDateTime(biddingDetails.postponement)}
+            </p>
           )}
 
           <p>Portal dos terceiros: M2A TECNOLOGIA</p>
