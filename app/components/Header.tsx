@@ -3,8 +3,8 @@ import LogoSAAE from "../../public/LogoSAAE.jpeg";
 
 const Header: React.FC = () => {
   return (
-    <header className="bg-gradient-to-r from-white  to-blue-200 text-black p-4 shadow-md">
-      <nav className="container mx-auto flex justify-between items-center">
+    <header className="bg-blue-700 text-white shadow-md">
+      <div className="container mx-auto p-4 px-28 flex justify-between items-center">
         <div className="flex items-center">
           <Image
             src={LogoSAAE}
@@ -14,24 +14,53 @@ const Header: React.FC = () => {
             className="rounded-md"
           />
         </div>
-        <div className="flex items-center space-x-6 font-semibold text-sm md:text-base">
-          <a href="/news" className="hover:text-cyan-600 transition-colors">
-            Notícias
+
+        <span className="text-2xl font-bold">
+          Sistema Autônomo de Água e Esgoto de Camocim
+        </span>
+      </div>
+      <nav className="bg-blue-900">
+        <div className="container mx-auto p-4 flex justify-center items-center space-x-6 font-semibold text-sm md:text-base">
+          <a href="/" className="hover:text-blue-200 transition-colors">
+            Início
           </a>
-          <a
-            href="/transparency"
-            className="hover:text-cyan-600 transition-colors"
-          >
-            Transparência
+          <a href="/empresa" className="hover:text-blue-200 transition-colors">
+            Empresa
           </a>
-          <a href="/biddings" className="hover:text-cyan-600 transition-colors">
+          <a href="/agua" className="hover:text-blue-200 transition-colors">
+            Água
+          </a>
+          <a href="/esgoto" className="hover:text-blue-200 transition-colors">
+            Esgoto
+          </a>
+          <a href="/biddings" className="hover:text-blue-200 transition-colors">
             Licitações
           </a>
+          <a href="/servicos" className="hover:text-blue-200 transition-colors">
+            Serviços
+          </a>
           <a
-            href="/water-quality"
-            className="hover:text-cyan-600 transition-colors"
+            href="/educativo"
+            className="hover:text-blue-200 transition-colors"
           >
-            Qualidade da Água
+            Educativo
+          </a>
+          <a
+            href="/redes-sociais"
+            className="hover:text-blue-200 transition-colors"
+          >
+            Redes Sociais
+          </a>
+          <a href="/imprensa" className="hover:text-blue-200 transition-colors">
+            Imprensa
+          </a>
+          <a
+            href="https://www.saaecamocimce.com.br/#/agencia/inicio"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-blue-200 transition-colors bg-blue-600 text-white py-2 px-4 rounded-full"
+          >
+            2º via/Serviços
           </a>
         </div>
       </nav>

@@ -31,6 +31,19 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
     return <div className="text-center py-4">Não há resultados.</div>;
   }
 
+  const getOpeningClass = (opening: string) => {
+    switch (opening) {
+      case "Fechada":
+        return "bg-danger text-white";
+      case "Aberta":
+        return "bg-success text-white";
+      case "Adiado":
+        return "bg-warning text-white";
+      default:
+        return "bg-gray-500 text-white";
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="min-w-full bg-white text-base">
@@ -51,7 +64,15 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
               <td className="py-2 px-4">{bid.object}</td>
               <td className="py-2 px-4">{bid.publicationDate}</td>
               <td className="py-2 px-4">{formatDateTime(bid.dispenseDate)}</td>
-              <td className="py-2 px-4">{bid.opening}</td>
+              <td className="py-2 px-4">
+                <span
+                  className={`px-2 py-1 rounded-full ${getOpeningClass(
+                    bid.opening
+                  )}`}
+                >
+                  {bid.opening}
+                </span>
+              </td>
               <td className="py-2 px-4 ">
                 <div className="align-middle self-center flex flex-row gap-2">
                   <button
