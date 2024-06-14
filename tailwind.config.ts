@@ -20,6 +20,9 @@ const config: Config = {
         danger: '#f87171',
         success: '#34d399',
         warning: '#fbbf24',
+
+        bluebanner: "#0B61A4",
+        bluemenu: "#033E6B",
         
       },
     },

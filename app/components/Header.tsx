@@ -1,17 +1,18 @@
 import Image from "next/image";
-import LogoSAAE from "../../public/LogoSAAE.jpeg";
-import atendimento from "../../public/atendimento.png";
+import LogoSAAEremovebg from "../../public/LogoSAAEremovebg.png";
+import capa from "../../public/capa.png";
+import atendimento from "../../public/atendimento.jpeg";
 
 const Header: React.FC = () => {
   return (
     <header>
-      <div className="bg-blue-700 text-white shadow-md">
-        <div className="container mx-auto p-4 flex justify-between items-center">
+      <div className="bg-bluebanner text-white shadow-md">
+        <div className="container mx-8 p-4 flex justify-between items-center">
           <Image
-            src={LogoSAAE}
+            src={LogoSAAEremovebg}
             alt="Logo SAAE"
-            height={180}
-            width={180}
+            height={200}
+            width={200}
             className="rounded-md"
           />
           <span className="mr-12 text-2xl font-bold">
@@ -19,7 +20,7 @@ const Header: React.FC = () => {
           </span>
         </div>
       </div>
-      <div className="bg-blue-900 text-white text-center py-8">
+      <div className="bg-blue-700 text-white text-center ">
         <a
           href="https://www.saaecamocimce.com.br/#/agencia/inicio"
           target="_blank"
@@ -33,24 +34,24 @@ const Header: React.FC = () => {
           />
         </a>
       </div>
-      <nav className="bg-blue-700">
-        <div className="container mx-auto p-4 flex justify-center items-center space-x-6 font-semibold text-sm md:text-base">
-          <a href="/" className="hover:text-blue-200 transition-colors">
+      <nav className="bg-bluemenu">
+        <div className="container mx-auto p-4 text-white flex justify-center items-center space-x-6 text-xs md:text-base">
+          <a href="/" className="hover:text-blue-500 transition-colors">
             Início
           </a>
-          <a href="/empresa" className="hover:text-blue-200 transition-colors">
+          <a href="/empresa" className="hover:text-blue-500 transition-colors">
             Empresa
           </a>
-          <a href="/agua" className="hover:text-blue-200 transition-colors">
+          <a href="/agua" className="hover:text-blue-500 transition-colors">
             Água
           </a>
-          <a href="/esgoto" className="hover:text-blue-200 transition-colors">
+          <a href="/esgoto" className="hover:text-blue-500 transition-colors">
             Esgoto
           </a>
-          <a href="/biddings" className="hover:text-blue-200 transition-colors">
+          <a href="/biddings" className="hover:text-blue-500 transition-colors">
             Licitações
           </a>
-          <a href="/servicos" className="hover:text-blue-200 transition-colors">
+          <a href="/servicos" className="hover:text-blue-500 transition-colors">
             Serviços
           </a>
           <a
@@ -67,14 +68,6 @@ const Header: React.FC = () => {
           </a>
           <a href="/imprensa" className="hover:text-blue-200 transition-colors">
             Imprensa
-          </a>
-          <a
-            href="https://www.saaecamocimce.com.br/#/agencia/inicio"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-blue-200 transition-colors bg-blue-600 text-white py-2 px-4 rounded-full"
-          >
-            2º via/Serviços
           </a>
         </div>
       </nav>
