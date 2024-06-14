@@ -18,6 +18,7 @@ interface Bidding {
   Url: string;
   modality: "Dispensa" | "Pregão" | "Concurso" | "Credenciamento";
   postponement: string | null; // Adicionado campo postponement
+  canceled: boolean; // Adicionado campo canceled
 }
 
 const formatDate = (dateString: string): string => {
@@ -152,10 +153,11 @@ const LicitacoesPage: React.FC = () => {
           ...bid,
           publicationDate: formatDate(bid.publicationDate),
           dispenseDate: bid.dispenseDate,
-          opening:
-            bid.postponement && bid.opening === "Aberta"
-              ? "Adiado"
-              : bid.opening,
+          opening: bid.canceled
+            ? "Anulado"
+            : bid.postponement && bid.opening === "Aberta"
+            ? "Adiado"
+            : bid.opening,
         }))}
       />
     </div>

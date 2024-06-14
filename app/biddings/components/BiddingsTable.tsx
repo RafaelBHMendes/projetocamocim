@@ -39,6 +39,8 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
         return "bg-success text-white";
       case "Adiado":
         return "bg-warning text-white";
+      case "Anulado":
+        return "bg-gray-700 text-white";
       default:
         return "bg-gray-500 text-white";
     }
