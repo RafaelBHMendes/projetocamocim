@@ -2,7 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Aplicar a fonte Inter como padrão para todo o site */
 body {
   font-family: "Inter", sans-serif;
-  background-color: #e5e5e5;
+  background-color: #e5e5e5; /* Define o fundo global */
+  margin: 0; /* Remove margem padrão */
+  padding: 0; /* Remove padding padrão */
+  min-height: 100vh; /* Garante que a altura mínima do body seja 100% da altura da viewport */
+  overflow-x: hidden; /* Remove o scroll horizontal */
 }
