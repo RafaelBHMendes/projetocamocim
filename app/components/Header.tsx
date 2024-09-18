@@ -1,12 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import LogoSAAEremovebg from '../../public/LogoSAAEremovebg.png'
-import capa from '../../public/capa.png'
+import Logowbg from '../../public/Logowbg.png'
 import atendimento from '../../public/atendimento.jpeg'
-import comunicado_banner from '@/public/comunicado_banner.jpeg'
 import { useState } from 'react'
 import React from 'react'
+import comunicado_banner from '../../public/comunicado_banner.png'
 
 const Header: React.FC = () => {
   const [showModal, setShowModal] = useState(false)
@@ -37,7 +36,7 @@ const Header: React.FC = () => {
     <header>
       <div className='bg-bluebanner text-white shadow-md'>
         <div className='container mx-8 p-4 flex justify-between items-center'>
-          <Image src={LogoSAAEremovebg} alt='Logo SAAE' height={200} width={200} className='rounded-md' />
+          <Image src={Logowbg} alt='Logo SAAE' height={200} width={200} className='rounded-md' />
           <span className='mr-12 text-2xl font-bold'>Serviço Autônomo de Água e Esgoto de Camocim</span>
         </div>
       </div>
