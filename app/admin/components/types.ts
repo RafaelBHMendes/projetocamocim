@@ -4,8 +4,10 @@ export interface Bid {
   object: string;
   publicationDate: string;
   dispenseDate: string;
-  opening: 'Aberta' | 'Fechada';  // assegura que o tipo seja um desses dois valores
+  opening: 'Aberta' | 'Fechada' | 'Adiado' | 'Anulado';
   file?: string;
-  Url: string;
+  Url?: string;
   modality: "Pregão" | "Concurso" | "Credenciamento" | "Dispensa" | "Concorrência";
+  postponement?: string;
+  canceled?: boolean;
 }

@@ -6,6 +6,8 @@ import { uploadPdf } from '@/api/uploadPdf'
 import { getPdfUrl } from '@/api/getPdfUrl'
 import { compressPDF } from '../utils/pdfCompressor'
 import { toast } from 'react-hot-toast'
+import { format } from 'date-fns'
+import { ptBR } from 'date-fns/locale'
 
 interface EditModalProps {
   bid: Bid
@@ -19,6 +21,7 @@ const EditModal: React.FC<EditModalProps> = ({ bid, isOpen, onClose, onEdit, set
   const [isUploading, setIsUploading] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
   const [initialBid] = useState(bid)
+  const [showPostponementField, setShowPostponementField] = useState(bid.opening === 'Adiado')
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -30,9 +33,34 @@ const EditModal: React.FC<EditModalProps> = ({ bid, isOpen, onClose, onEdit, set
     return () => window.removeEventListener('keydown', handleEscape)
   }, [])
 
+  useEffect(() => {
+    // Mostrar/esconder campo de adiamento baseado no status
+    setShowPostponementField(bid.opening === 'Adiado')
+
+    // Se mudar para Adiado, setar data de adiamento para agora
+    if (bid.opening === 'Adiado' && !bid.postponement) {
+      const now = new Date()
+      setBid((prev: any) => ({
+        ...prev,
+        postponement: format(now, "yyyy-MM-dd'T'HH:mm", { locale: ptBR })
+      }))
+    }
+
+    // Se mudar para Anulado, setar canceled como true
+    if (bid.opening === 'Anulado') {
+      setBid((prev: any) => ({ ...prev, canceled: true }))
+    }
+  }, [bid.opening])
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setBid((prev: any) => ({ ...prev, [name]: value }))
+    setHasChanges(true)
+  }
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target
+    setBid((prev: any) => ({ ...prev, [name]: checked }))
     setHasChanges(true)
   }
 
@@ -77,10 +105,24 @@ const EditModal: React.FC<EditModalProps> = ({ bid, isOpen, onClose, onEdit, set
   }
 
   const handleSave = () => {
+    // Validações
     if (!bid.processNumber || !bid.object || !bid.publicationDate || !bid.dispenseDate) {
       toast.error('Por favor, preencha todos os campos obrigatórios')
       return
     }
+
+    // Validação específica para status Adiado
+    if (bid.opening === 'Adiado' && !bid.postponement) {
+      toast.error('Por favor, informe a data do adiamento')
+      return
+    }
+
+    // Validação específica para status Anulado
+    if (bid.opening === 'Anulado' && !bid.canceled) {
+      toast.error('Por favor, confirme a anulação marcando a caixa de seleção')
+      return
+    }
+
     onEdit(bid)
   }
 
@@ -97,9 +139,28 @@ const EditModal: React.FC<EditModalProps> = ({ bid, isOpen, onClose, onEdit, set
             <div className='bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4'>
               <div className='sm:flex sm:items-start'>
                 <div className='mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full'>
-                  <h3 className='text-xl font-semibold leading-6 text-gray-900 mb-6'>
-                    Editar Licitação
-                  </h3>
+                  <div className='flex items-center justify-between mb-6'>
+                    <h3 className='text-xl font-semibold leading-6 text-gray-900'>
+                      Editar Licitação
+                    </h3>
+                    <div className='flex items-center space-x-2'>
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                        ${
+                          bid.opening === 'Aberta'
+                            ? 'bg-green-100 text-green-800'
+                            : bid.opening === 'Fechada'
+                            ? 'bg-red-100 text-red-800'
+                            : bid.opening === 'Adiado'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {bid.opening}
+                      </span>
+                    </div>
+                  </div>
+
                   <div className='mt-2 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2'>
                     <div className='sm:col-span-2'>
                       <label className='block text-sm font-medium text-gray-700'>
@@ -185,8 +246,50 @@ const EditModal: React.FC<EditModalProps> = ({ bid, isOpen, onClose, onEdit, set
                       >
                         <option value='Aberta'>Aberta</option>
                         <option value='Fechada'>Fechada</option>
+                        <option value='Adiado'>Adiado</option>
+                        <option value='Anulado'>Anulado</option>
                       </select>
                     </div>
+
+                    {/* Campo de adiamento - aparece apenas quando status é 'Adiado' */}
+                    {showPostponementField && (
+                      <div className='sm:col-span-2'>
+                        <label className='block text-sm font-medium text-gray-700'>
+                          Data do Adiamento <span className='text-red-500'>*</span>
+                        </label>
+                        <input
+                          name='postponement'
+                          type='datetime-local'
+                          required
+                          value={bid.postponement || ''}
+                          onChange={handleInputChange}
+                          className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
+                        />
+                      </div>
+                    )}
+
+                    {/* Checkbox de cancelamento - aparece apenas quando status é 'Anulado' */}
+                    {bid.opening === 'Anulado' && (
+                      <div className='sm:col-span-2'>
+                        <div className='relative flex items-start'>
+                          <div className='flex h-5 items-center'>
+                            <input
+                              type='checkbox'
+                              name='canceled'
+                              checked={bid.canceled}
+                              onChange={handleCheckboxChange}
+                              className='h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                            />
+                          </div>
+                          <div className='ml-3 text-sm'>
+                            <label className='font-medium text-gray-700'>Confirmar Anulação</label>
+                            <p className='text-gray-500'>
+                              Marque esta caixa para confirmar a anulação da licitação
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
 
                     <div className='sm:col-span-2'>
                       <label className='block text-sm font-medium text-gray-700'>
@@ -229,7 +332,7 @@ const EditModal: React.FC<EditModalProps> = ({ bid, isOpen, onClose, onEdit, set
                         name='Url'
                         type='url'
                         placeholder='https://exemplo.com'
-                        value={bid.Url}
+                        value={bid.Url || ''}
                         onChange={handleInputChange}
                         className='mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
                       />
