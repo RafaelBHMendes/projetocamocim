@@ -5,8 +5,7 @@ import { getPdfUrl } from '../../../api/getPdfUrl'
 import { uploadPdf } from '../../../api/uploadPdf'
 import { compressPDF } from '../../utils/pdfCompressor'
 import { toast } from 'react-hot-toast'
-
-import { Bid } from './types'
+import { Bid, BiddingDocument } from './types'
 
 interface BiddingFormProps {
   onAdd: (bid: Bid) => void
@@ -16,6 +15,7 @@ interface BiddingFormProps {
 
 const BiddingForm: React.FC<BiddingFormProps> = ({ onAdd, newBid, setNewBid }) => {
   const [isUploading, setIsUploading] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<{ [key: string]: number }>({})
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
@@ -23,32 +23,57 @@ const BiddingForm: React.FC<BiddingFormProps> = ({ onAdd, newBid, setNewBid }) =
   }
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files?.[0]) {
+    if (e.target.files && e.target.files.length > 0) {
       try {
         setIsUploading(true)
-        const file = e.target.files[0]
+        const files = Array.from(e.target.files).slice(0, 3) // Limita a 3 arquivos
+        const newDocuments: BiddingDocument[] = []
 
-        // Comprimir o PDF
-        const compressedFile = await compressPDF(file)
+        for (const file of files) {
+          setUploadProgress(prev => ({ ...prev, [file.name]: 0 }))
 
-        // Converter o Blob comprimido para File
-        const compressedPdfFile = new File([compressedFile], file.name, {
-          type: 'application/pdf'
-        })
+          // Comprimir o PDF
+          const compressedFile = await compressPDF(file)
 
-        const filePath = await uploadPdf(compressedPdfFile)
-        if (filePath) {
-          const url = await getPdfUrl(filePath)
-          setNewBid({ ...newBid, file: url })
-          toast.success('PDF comprimido e enviado com sucesso!')
+          // Converter o Blob comprimido para File
+          const compressedPdfFile = new File([compressedFile], file.name, {
+            type: 'application/pdf'
+          })
+
+          const filePath = await uploadPdf(compressedPdfFile)
+          if (filePath) {
+            const url = await getPdfUrl(filePath)
+            newDocuments.push({
+              fileName: file.name,
+              fileUrl: url,
+              fileType: 'edital'
+            })
+            setUploadProgress(prev => ({ ...prev, [file.name]: 100 }))
+          }
         }
+
+        // Atualiza o estado com os novos documentos
+        setNewBid(prev => ({
+          ...prev,
+          documents: [...(prev.documents || []), ...newDocuments]
+        }))
+
+        toast.success('PDFs comprimidos e enviados com sucesso!')
       } catch (error) {
-        console.error('Erro ao processar o PDF:', error)
-        toast.error('Erro ao processar o PDF. Tente novamente.')
+        console.error('Erro ao processar os PDFs:', error)
+        toast.error('Erro ao processar os PDFs. Tente novamente.')
       } finally {
         setIsUploading(false)
+        setUploadProgress({})
       }
     }
+  }
+
+  const removeDocument = (index: number) => {
+    setNewBid(prev => ({
+      ...prev,
+      documents: prev.documents?.filter((_, i) => i !== index)
+    }))
   }
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -156,15 +181,18 @@ const BiddingForm: React.FC<BiddingFormProps> = ({ onAdd, newBid, setNewBid }) =
         </div>
 
         <div className='sm:col-span-2'>
-          <label className='block text-sm font-medium text-gray-700'>PDF do Processo</label>
-          <div className='mt-1 flex items-center'>
+          <label className='block text-sm font-medium text-gray-700'>
+            PDFs do Processo (máx. 3)
+          </label>
+          <div className='mt-1 flex flex-col space-y-4'>
             <div className='relative flex-grow'>
               <input
                 name='file'
                 type='file'
                 accept='application/pdf'
                 onChange={handleFileChange}
-                disabled={isUploading}
+                disabled={isUploading || (newBid.documents?.length || 0) >= 3}
+                multiple
                 className='block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm'
               />
               {isUploading && (
@@ -173,15 +201,44 @@ const BiddingForm: React.FC<BiddingFormProps> = ({ onAdd, newBid, setNewBid }) =
                 </div>
               )}
             </div>
-            {newBid.file && (
-              <a
-                href={newBid.file}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='ml-3 inline-flex items-center px-2.5 py-1.5 border border-gray-300 shadow-sm text-xs font-medium rounded text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500'
-              >
-                Ver atual
-              </a>
+
+            {/* Lista de documentos */}
+            {newBid.documents && newBid.documents.length > 0 && (
+              <div className='space-y-2'>
+                {newBid.documents.map((doc, index) => (
+                  <div
+                    key={index}
+                    className='flex items-center justify-between p-2 bg-gray-50 rounded-md'
+                  >
+                    <a
+                      href={doc.fileUrl}
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='text-sm text-blue-600 hover:text-blue-500'
+                    >
+                      {doc.fileName}
+                    </a>
+                    <button
+                      type='button'
+                      onClick={() => removeDocument(index)}
+                      className='text-red-600 hover:text-red-500'
+                    >
+                      <svg
+                        xmlns='http://www.w3.org/2000/svg'
+                        className='h-5 w-5'
+                        viewBox='0 0 20 20'
+                        fill='currentColor'
+                      >
+                        <path
+                          fillRule='evenodd'
+                          d='M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z'
+                          clipRule='evenodd'
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                ))}
+              </div>
             )}
           </div>
         </div>

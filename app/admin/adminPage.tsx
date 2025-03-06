@@ -71,28 +71,57 @@ const AdminPage: React.FC = () => {
   }
 
   const handleAddBid = async (bid: Bid): Promise<void> => {
-    const { data, error } = await supabase.from('bidding').insert([
-      {
-        ...bid,
-        publicationDate: new Date(bid.publicationDate.split('/').reverse().join('-')).toISOString(),
-        dispenseDate: new Date(bid.dispenseDate.split('/').reverse().join('-')).toISOString()
+    try {
+      // Primeiro, insere a licitação
+      const { data: biddingData, error: biddingError } = await supabase
+        .from('bidding')
+        .insert([
+          {
+            ...bid,
+            publicationDate: new Date(
+              bid.publicationDate.split('/').reverse().join('-')
+            ).toISOString(),
+            dispenseDate: new Date(bid.dispenseDate.split('/').reverse().join('-')).toISOString()
+          }
+        ])
+        .select()
+
+      if (biddingError) throw biddingError
+
+      // Se houver documentos, insere-os na tabela bidding_document
+      if (bid.documents && bid.documents.length > 0 && biddingData) {
+        const biddingId = biddingData[0].id
+        const documentsToInsert = bid.documents.map(doc => ({
+          bidding_id: biddingId,
+          file_name: doc.fileName,
+          file_url: doc.fileUrl,
+          file_type: doc.fileType
+        }))
+
+        const { error: documentsError } = await supabase
+          .from('bidding_document')
+          .insert(documentsToInsert)
+
+        if (documentsError) throw documentsError
       }
-    ])
-    if (error) {
+
+      if (biddingData) {
+        setBiddings(prevBids => [...prevBids, ...biddingData])
+        setNewBid({
+          processNumber: '',
+          object: '',
+          publicationDate: '',
+          dispenseDate: '',
+          opening: 'Aberta',
+          Url: '',
+          modality: 'Pregão',
+          documents: []
+        })
+        toast.success('Licitação Adicionada!')
+      }
+    } catch (error: any) {
       console.error('Failed to add bid', error)
       toast.error('Erro: ' + error.message)
-    } else if (data) {
-      setBiddings(prevBids => [...prevBids, ...data])
-      setNewBid({
-        processNumber: '',
-        object: '',
-        publicationDate: '',
-        dispenseDate: '',
-        opening: 'Aberta',
-        Url: '',
-        modality: 'Pregão'
-      }) // Reset form
-      toast.success('Licitação Adicionada!')
     }
   }
 
@@ -140,7 +169,7 @@ const AdminPage: React.FC = () => {
   }
 
   return (
-    <div className='min-h-screen bg-gray-50'>
+    <div className='min-h-screen bg-gray-100'>
       {/* Header */}
       <header className='bg-white shadow-sm'>
         <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4'>
