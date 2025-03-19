@@ -72,12 +72,15 @@ const AdminPage: React.FC = () => {
 
   const handleAddBid = async (bid: Bid): Promise<void> => {
     try {
+      // Separa os documentos do objeto bid
+      const { documents, ...biddingData } = bid
+
       // Primeiro, insere a licitação
-      const { data: biddingData, error: biddingError } = await supabase
+      const { data: insertedBidding, error: biddingError } = await supabase
         .from('bidding')
         .insert([
           {
-            ...bid,
+            ...biddingData,
             publicationDate: new Date(
               bid.publicationDate.split('/').reverse().join('-')
             ).toISOString(),
@@ -86,27 +89,40 @@ const AdminPage: React.FC = () => {
         ])
         .select()
 
-      if (biddingError) throw biddingError
+      if (biddingError) {
+        console.error('Erro ao inserir licitação:', biddingError)
+        throw biddingError
+      }
 
-      // Se houver documentos, insere-os na tabela bidding_document
-      if (bid.documents && bid.documents.length > 0 && biddingData) {
-        const biddingId = biddingData[0].id
-        const documentsToInsert = bid.documents.map(doc => ({
+      // Se houver documentos e a licitação foi inserida com sucesso
+      if (documents && documents.length > 0 && insertedBidding && insertedBidding.length > 0) {
+        const biddingId = insertedBidding[0].id
+
+        // Prepara os documentos para inserção
+        const documentsToInsert = documents.map(doc => ({
           bidding_id: biddingId,
           file_name: doc.fileName,
           file_url: doc.fileUrl,
-          file_type: doc.fileType
+          file_type: doc.fileType || 'edital',
+          uploaded_at: new Date().toISOString()
         }))
 
+        // Tenta inserir os documentos
         const { error: documentsError } = await supabase
           .from('bidding_document')
           .insert(documentsToInsert)
 
-        if (documentsError) throw documentsError
+        if (documentsError) {
+          console.error('Erro ao inserir documentos:', documentsError)
+          // Se falhar ao inserir documentos, remove a licitação para manter consistência
+          await supabase.from('bidding').delete().match({ id: biddingId })
+          throw documentsError
+        }
       }
 
-      if (biddingData) {
-        setBiddings(prevBids => [...prevBids, ...biddingData])
+      // Se chegou aqui, tudo deu certo
+      if (insertedBidding) {
+        setBiddings(prevBids => [...prevBids, ...insertedBidding])
         setNewBid({
           processNumber: '',
           object: '',
@@ -114,14 +130,13 @@ const AdminPage: React.FC = () => {
           dispenseDate: '',
           opening: 'Aberta',
           Url: '',
-          modality: 'Pregão',
-          documents: []
+          modality: 'Pregão'
         })
         toast.success('Licitação Adicionada!')
       }
     } catch (error: any) {
-      console.error('Failed to add bid', error)
-      toast.error('Erro: ' + error.message)
+      console.error('Erro ao adicionar licitação:', error)
+      toast.error(`Erro: ${error.message || 'Erro desconhecido ao adicionar licitação'}`)
     }
   }
 

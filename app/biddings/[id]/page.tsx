@@ -7,20 +7,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
-
-interface BiddingDetails {
-  id: number
-  processNumber: string
-  object: string
-  publicationDate: string
-  dispenseDate: string
-  opening: string
-  file: string
-  Url: string
-  modality: string
-  postponement: string | null
-  canceled?: boolean
-}
+import { Bidding } from '../../types/bidding'
 
 const formatDateTime = (dateTimeString: string): string => {
   try {
@@ -54,7 +41,7 @@ const getModalityClass = (modality: string) => {
 }
 
 const BiddingDetailsPage: React.FC = () => {
-  const [biddingDetails, setBiddingDetails] = useState<BiddingDetails | null>(null)
+  const [biddingDetails, setBiddingDetails] = useState<Bidding | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -64,14 +51,57 @@ const BiddingDetailsPage: React.FC = () => {
         const pathSegments = window.location.pathname.split('/')
         const id = pathSegments[pathSegments.length - 1]
 
-        const { data, error } = await supabase
+        const { data: biddingData, error: biddingError } = await supabase
           .from('bidding')
-          .select('*')
+          .select(
+            `
+            id,
+            processNumber,
+            object,
+            publicationDate,
+            dispenseDate,
+            opening,
+            file,
+            Url,
+            modality,
+            postponement,
+            canceled
+          `
+          )
           .eq('id', parseInt(id))
           .single()
 
-        if (error) throw error
-        setBiddingDetails(data)
+        if (biddingError) throw biddingError
+
+        // Busca documentos separadamente
+        const { data: documentsData, error: documentsError } = await supabase
+          .from('bidding_document')
+          .select(
+            `
+            id,
+            file_name,
+            file_url,
+            file_type,
+            uploaded_at
+          `
+          )
+          .eq('bidding_id', parseInt(id))
+
+        if (documentsError) throw documentsError
+
+        // Mapeia os documentos para o formato correto
+        const documents = documentsData?.map(doc => ({
+          id: doc.id,
+          fileName: doc.file_name,
+          fileUrl: doc.file_url,
+          fileType: doc.file_type,
+          uploadedAt: doc.uploaded_at
+        }))
+
+        setBiddingDetails({
+          ...biddingData,
+          documents
+        })
       } catch (error) {
         console.error('Erro ao buscar detalhes da licitação:', error)
       } finally {
@@ -112,7 +142,7 @@ const BiddingDetailsPage: React.FC = () => {
       <div className='max-w-4xl mx-auto px-4 sm:px-6 lg:px-8'>
         {/* Navegação */}
         <nav className='mb-8 flex items-center space-x-2'>
-          <Link
+        <Link
             href='/biddings'
             className='inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-700'
           >
@@ -125,7 +155,7 @@ const BiddingDetailsPage: React.FC = () => {
               />
             </svg>
             Voltar para lista
-          </Link>
+        </Link>
         </nav>
 
         {/* Conteúdo principal */}
@@ -155,19 +185,8 @@ const BiddingDetailsPage: React.FC = () => {
                   </span>
                 </div>
               </div>
-              {biddingDetails.file && (
-                <a
-                  href={biddingDetails.file}
-                  target='_blank'
-                  rel='noopener noreferrer'
-                  className='inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700'
-                >
-                  <Image src={pdf} alt='PDF' width={20} height={20} className='mr-2' />
-                  Baixar Edital
-                </a>
-              )}
-            </div>
-          </div>
+      </div>
+        </div>
 
           {/* Corpo */}
           <div className='px-6 py-6 space-y-6'>
@@ -185,7 +204,7 @@ const BiddingDetailsPage: React.FC = () => {
                   {formatDateTime(biddingDetails.dispenseDate)}
                 </p>
               </div>
-              {biddingDetails.postponement && (
+          {biddingDetails.postponement && (
                 <div className='md:col-span-2'>
                   <h3 className='text-sm font-medium text-gray-500'>Nova Data (Adiamento)</h3>
                   <p className='mt-1 text-lg text-gray-900'>
@@ -193,7 +212,7 @@ const BiddingDetailsPage: React.FC = () => {
                   </p>
                 </div>
               )}
-            </div>
+        </div>
 
             {/* Objeto */}
             <div>
@@ -201,23 +220,65 @@ const BiddingDetailsPage: React.FC = () => {
               <div className='bg-gray-50 rounded-lg p-4'>
                 <p className='text-gray-900 whitespace-pre-wrap'>{biddingDetails.object}</p>
               </div>
-            </div>
+        </div>
+
+            {/* Documentos */}
+            {(biddingDetails.file ||
+              (biddingDetails.documents && biddingDetails.documents.length > 0)) && (
+              <div>
+                <h3 className='text-sm font-medium text-gray-500 mb-2'>Documentos</h3>
+                <div className='bg-gray-50 rounded-lg p-4 space-y-4'>
+                  {biddingDetails.file && (
+                    <div className='flex items-center justify-between'>
+                      <div className='flex items-center'>
+                        <Image src={pdf} alt='PDF' width={24} height={24} className='mr-3' />
+                        <span className='text-gray-900'>Edital Principal</span>
+                      </div>
+                      <a
+                        href={biddingDetails.file}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 hover:text-blue-800'
+                      >
+                        Visualizar
+                      </a>
+                    </div>
+                  )}
+                  {biddingDetails.documents?.map(doc => (
+                    <div key={doc.id} className='flex items-center justify-between'>
+                      <div className='flex items-center'>
+                        <Image src={pdf} alt='PDF' width={24} height={24} className='mr-3' />
+                        <span className='text-gray-900'>{doc.fileName}</span>
+                      </div>
+                      <a
+                        href={doc.fileUrl}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 hover:text-blue-800'
+                      >
+                        Visualizar
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Links */}
             {biddingDetails.Url && (
               <div>
                 <h3 className='text-sm font-medium text-gray-500 mb-2'>Link do Processo</h3>
                 <div className='bg-gray-50 rounded-lg p-4'>
-                  <a
-                    href={biddingDetails.Url}
+            <a
+              href={biddingDetails.Url}
                     target='_blank'
                     rel='noopener noreferrer'
                     className='text-blue-600 hover:text-blue-800 break-all'
                   >
-                    {biddingDetails.Url}
-                  </a>
-                </div>
-              </div>
+                {biddingDetails.Url}
+            </a>
+          </div>
+        </div>
             )}
           </div>
         </div>

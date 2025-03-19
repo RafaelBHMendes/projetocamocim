@@ -5,19 +5,20 @@ export interface Bidding {
     publicationDate: string
     dispenseDate: string
     opening: string
-    file: string | undefined
+    file?: string
     Url: string
     modality: string
-    postponement?: string
+    postponement: string | null
     canceled?: boolean
+    documents?: BiddingDocument[]
 }
 
 export interface BiddingDocument {
-    id?: number
+    id: number
     fileName: string
     fileUrl: string
     fileType: string
-    uploadedAt?: string
+    uploadedAt?: Date
 }
 
 export interface FilterOptions {
