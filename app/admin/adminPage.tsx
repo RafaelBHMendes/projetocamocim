@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react'
 import { Bid } from '../admin/components/types'
 import BiddingForm from '../admin/components/BiddingForm'
 import BiddingList from '../admin/components/BiddingList'
-import supabase from '../lib/supabase'
 import { toast } from 'react-hot-toast'
 import { signOut } from './components/SignOut'
 import EditModal from '../components/EditModal'
@@ -40,8 +39,11 @@ const AdminPage: React.FC = () => {
   const fetchBiddings = async () => {
     try {
       setIsLoading(true)
-      let { data, error } = await supabase.from('bidding').select('*')
-      if (error) throw error
+      const response = await fetch('/api/biddings')
+      if (!response.ok) {
+        throw new Error('Erro ao buscar licitações')
+      }
+      const data = await response.json()
       setBiddings(data || [])
     } catch (error) {
       console.error('Error fetching biddings:', error)
@@ -72,68 +74,31 @@ const AdminPage: React.FC = () => {
 
   const handleAddBid = async (bid: Bid): Promise<void> => {
     try {
-      // Separa os documentos do objeto bid
-      const { documents, ...biddingData } = bid
+      const response = await fetch('/api/biddings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bid)
+      })
 
-      // Primeiro, insere a licitação
-      const { data: insertedBidding, error: biddingError } = await supabase
-        .from('bidding')
-        .insert([
-          {
-            ...biddingData,
-            publicationDate: new Date(
-              bid.publicationDate.split('/').reverse().join('-')
-            ).toISOString(),
-            dispenseDate: new Date(bid.dispenseDate.split('/').reverse().join('-')).toISOString()
-          }
-        ])
-        .select()
-
-      if (biddingError) {
-        console.error('Erro ao inserir licitação:', biddingError)
-        throw biddingError
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.message || 'Erro ao adicionar licitação')
       }
 
-      // Se houver documentos e a licitação foi inserida com sucesso
-      if (documents && documents.length > 0 && insertedBidding && insertedBidding.length > 0) {
-        const biddingId = insertedBidding[0].id
-
-        // Prepara os documentos para inserção
-        const documentsToInsert = documents.map(doc => ({
-          bidding_id: biddingId,
-          file_name: doc.fileName,
-          file_url: doc.fileUrl,
-          file_type: doc.fileType || 'edital',
-          uploaded_at: new Date().toISOString()
-        }))
-
-        // Tenta inserir os documentos
-        const { error: documentsError } = await supabase
-          .from('bidding_document')
-          .insert(documentsToInsert)
-
-        if (documentsError) {
-          console.error('Erro ao inserir documentos:', documentsError)
-          // Se falhar ao inserir documentos, remove a licitação para manter consistência
-          await supabase.from('bidding').delete().match({ id: biddingId })
-          throw documentsError
-        }
-      }
-
-      // Se chegou aqui, tudo deu certo
-      if (insertedBidding) {
-        setBiddings(prevBids => [...prevBids, ...insertedBidding])
-        setNewBid({
-          processNumber: '',
-          object: '',
-          publicationDate: '',
-          dispenseDate: '',
-          opening: 'Aberta',
-          Url: '',
-          modality: 'Pregão'
-        })
-        toast.success('Licitação Adicionada!')
-      }
+      const newBidding = await response.json()
+      setBiddings(prevBids => [...prevBids, newBidding])
+      setNewBid({
+        processNumber: '',
+        object: '',
+        publicationDate: '',
+        dispenseDate: '',
+        opening: 'Aberta',
+        Url: '',
+        modality: 'Pregão'
+      })
+      toast.success('Licitação Adicionada!')
     } catch (error: any) {
       console.error('Erro ao adicionar licitação:', error)
       toast.error(`Erro: ${error.message || 'Erro desconhecido ao adicionar licitação'}`)
@@ -141,36 +106,49 @@ const AdminPage: React.FC = () => {
   }
 
   const handleRemoveBid = async (id: number): Promise<void> => {
-    const { data, error } = await supabase.from('bidding').delete().match({ id })
+    try {
+      const response = await fetch(`/api/biddings/${id}`, {
+        method: 'DELETE'
+      })
 
-    if (error) {
-      console.error('Failed to remove bid', error)
-      toast.error('Erro: ' + error.message)
-    } else {
+      if (!response.ok) {
+        throw new Error('Erro ao remover licitação')
+      }
+
       setBiddings(prevBids => prevBids.filter(bid => bid.id !== id))
       toast.success('Licitação Removida!')
+    } catch (error: any) {
+      console.error('Failed to remove bid', error)
+      toast.error('Erro: ' + error.message)
     }
   }
 
   const handleUpdateBid = async (updatedBid: Bid) => {
-    const { data, error } = await supabase
-      .from('bidding')
-      .update(updatedBid)
-      .match({ id: updatedBid.id })
+    try {
+      const response = await fetch(`/api/biddings/${updatedBid.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updatedBid)
+      })
 
-    if (error) {
-      console.error('Failed to update bid', error)
-      toast.error('Erro ao atualizar: ' + error.message)
-    } else {
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar licitação')
+      }
+
       setBiddings(prevBids => prevBids.map(bid => (bid.id === updatedBid.id ? updatedBid : bid)))
       handleCloseModal()
       toast.success('Licitação Atualizada com Sucesso!')
+    } catch (error: any) {
+      console.error('Failed to update bid', error)
+      toast.error('Erro ao atualizar: ' + error.message)
     }
     setEditModalOpen(false)
   }
 
   const handleSignOut = async () => {
-    await signOut() // Note que essa chamada não será mais definida aqui, apenas chamada
+    await signOut()
   }
 
   const handleEditBid = (bid: Bid) => {
@@ -180,7 +158,7 @@ const AdminPage: React.FC = () => {
 
   const handleCloseModal = () => {
     setEditModalOpen(false)
-    setCurrentBid(null) // Limpa o bid atual após fechar o modal
+    setCurrentBid(null)
   }
 
   return (

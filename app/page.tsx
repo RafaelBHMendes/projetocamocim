@@ -1,18 +1,18 @@
-import Header from "./components/Header";
+import Header from './components/Header'
 
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
-import Footer from "./components/Footer";
-import MapView from "./components/MapView";
-import Carousel from "./components/Carousel";
-import Notices from "./components/Notices";
+import Footer from './components/Footer'
+import MapView from './components/MapView'
+import Carousel from './components/Carousel'
+import Notices from './components/Notices'
 
 export default function Home() {
   return (
     <>
       <ToastContainer
-        position="top-right"
+        position='top-right'
         autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}
@@ -22,7 +22,7 @@ export default function Home() {
         draggable
         pauseOnHover
       />
-      <div className="flex flex-col">
+      <div className='flex flex-col'>
         <Header />
 
         <Carousel />
@@ -31,5 +31,5 @@ export default function Home() {
         <Footer />
       </div>
     </>
-  );
+  )
 }

@@ -6,6 +6,7 @@ import { ptBR } from 'date-fns/locale'
 import { Bidding } from '../../types/bidding'
 
 import eye from '../../../public/eye.svg'
+import pdf from '../../../public/pdf.svg'
 
 const formatDateTime = (dateTimeString: string): string => {
   try {
@@ -108,7 +109,7 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
                 scope='col'
                 className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'
               >
-                Detalhes
+                Ações
               </th>
             </tr>
           </thead>
@@ -158,6 +159,23 @@ const BiddingsTable: React.FC<{ biddings: Bidding[] }> = ({ biddings }) => {
                 </td>
                 <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
                   <div className='flex items-center space-x-6'>
+                    {(bid.file || (bid.documents && bid.documents.length > 0)) && (
+                      <a
+                        href={bid.file || bid.documents?.[0].fileUrl}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-blue-600 hover:text-blue-900 transition-colors duration-200'
+                        title='Visualizar PDF'
+                      >
+                        <Image
+                          src={pdf}
+                          alt='PDF'
+                          width={32}
+                          height={32}
+                          className='hover:scale-110 transition-transform duration-200'
+                        />
+                      </a>
+                    )}
                     <Link
                       href={`/biddings/${bid.id}`}
                       className='text-blue-600 hover:text-blue-900 transition-colors duration-200'
